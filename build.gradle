@@ -30,6 +30,12 @@ repositories {
     maven { url 'https://kotlin.bintray.com/kotlinx' }
 }
 
+kotlin {
+    experimental {
+        coroutines "enable"
+    }
+}
+
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compile "io.ktor:ktor-server-netty:$ktor_version"
