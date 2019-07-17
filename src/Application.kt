@@ -57,10 +57,10 @@ fun Application.module(testing: Boolean = false) {
         }
     }
 
-    install(CallLogging) {
-        level = Level.INFO
-        filter { call -> call.request.path().startsWith("/") }
-    }
+//    install(CallLogging) {
+//        level = Level.INFO
+//        filter { call -> call.request.path().startsWith("/") }
+//    }
 
     install(CachingHeaders) {
         options { outgoingContent ->
@@ -69,10 +69,6 @@ fun Application.module(testing: Boolean = false) {
                 else -> null
             }
         }
-    }
-
-    install(DefaultHeaders) {
-        header("X-Engine", "Ktor") // will send this header with each response
     }
 
     install(Webjars) {

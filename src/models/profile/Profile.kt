@@ -1,4 +1,8 @@
-package server
+package models.profile
+
+import com.fasterxml.jackson.annotation.JsonIgnore
+import org.bson.codecs.pojo.annotations.BsonId
+import java.util.*
 
 /**
  * Copyright 2019 Yazan Yarifi
@@ -19,18 +23,23 @@ package server
 /**
  * Created By : Yazan Tarifi
  * Date : 7/17/2019
- * Time : 2:51 PM
+ * Time : 7:53 PM
  */
 
-class SetupDatabase {
+data class Profile(
+    @BsonId var id: UUID = UUID.randomUUID(),
+    var email: String,
+    @JsonIgnore var password: String,
+    var name: String,
+    var enabled: Boolean,
+    var type: String,
+    var phoneNumber: String,
+    var location: ProfileLocation
+)
 
-//    init {
-//        Database.connect(
-//            url = "${Property["db.host"]}/${Property["db.database"]}",
-//            driver = Property["db.driver"],
-//            user = Property["db.user"],
-//            password = Property["db.pass"]
-//        )
-//    }
-
-}
+data class ProfileLocation(
+    @BsonId var id: UUID = UUID.randomUUID(),
+    var locationName: String,
+    var latitude: Double,
+    var longitude: Double
+)

@@ -1,16 +1,21 @@
 package server
 
+import com.fasterxml.jackson.databind.SerializationFeature
 import io.ktor.application.Application
 import io.ktor.application.install
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.features.websocket.WebSockets
 import io.ktor.client.features.websocket.ws
-import io.ktor.features.CallLogging
-import io.ktor.features.DefaultHeaders
+import io.ktor.features.*
+import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.cio.websocket.Frame
 import io.ktor.http.cio.websocket.readText
+import io.ktor.jackson.jackson
+import io.ktor.locations.Locations
+import io.ktor.request.path
+import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.ktor.util.KtorExperimentalAPI
@@ -18,9 +23,11 @@ import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.channels.filterNotNull
 import kotlinx.coroutines.channels.map
 import kotlinx.coroutines.runBlocking
+import org.koin.ktor.ext.installKoin
 import org.slf4j.event.Level
 import utils.ReflexConsts
 import view.DemoView
+import java.util.*
 
 /**
  * Copyright 2019 Yazan Yarifi
@@ -46,12 +53,12 @@ import view.DemoView
 
 @KtorExperimentalAPI
 fun startServer() = embeddedServer(
-    Netty,
+    factory = Netty,
     port = ReflexConsts.port,
     host = ReflexConsts.host
 ) {
-//    startWebSocketConfiguration()
-    addDefaultApplicationHeaders()
+    //    startWebSocketConfiguration()
+    addDefaultApplicationConfiguration()
     DemoView()
 }.start(wait = true)
 
@@ -69,14 +76,50 @@ fun startWebSocketConfiguration() {
     }
 }
 
-fun Application.addDefaultApplicationHeaders() {
+fun Application.addDefaultApplicationConfiguration() {
     install(DefaultHeaders) {
         header("X-Developer", ReflexConsts.DeveloperName)
         header("X-Server", ReflexConsts.ServerName)
+        header("Origin", ReflexConsts.Origin)
+        header("Accept-Charset", ReflexConsts.AcceptCharset)
+        header("Date", Date().toString())
+        header("X-Engine", "Ktor")
+        header("X-Environment", "Dev")
     }
 
     install(CallLogging) {
         level = Level.INFO
+        filter { call ->
+            call.request.path().startsWith("/")
+        }
     }
+
+    install(ContentNegotiation) {
+        jackson {
+            enable(SerializationFeature.INDENT_OUTPUT)
+        }
+    }
+
+    install(Locations)
+    install(DataConversion)
+
+    install(CORS) {
+        method(HttpMethod.Options)
+        method(HttpMethod.Put)
+        method(HttpMethod.Delete)
+        method(HttpMethod.Patch)
+        header(HttpHeaders.Authorization)
+//        allowCredentials = true
+//        anyHost() // @TODO: Don't do this in production if possible. Try to limit it.
+    }
+
+    installKoin {
+        modules(modules)
+    }
+
+    routing {
+
+    }
+
 }
 

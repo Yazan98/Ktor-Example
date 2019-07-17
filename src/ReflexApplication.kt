@@ -1,7 +1,7 @@
 import io.ktor.util.KtorExperimentalAPI
 import server.startServer
 
-object WsClientApp {
+object ReflexApplication {
 
     @KtorExperimentalAPI
     @JvmStatic

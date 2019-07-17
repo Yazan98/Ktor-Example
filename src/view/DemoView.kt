@@ -30,7 +30,7 @@ import io.ktor.routing.routing
 
 fun Application.DemoView() {
     routing {
-        get("/hello") {
+        get(path = "/hello") {
             call.respondText("OK")
         }
     }

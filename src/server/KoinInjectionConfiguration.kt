@@ -1,4 +1,8 @@
-package utils
+package server
+
+import org.koin.dsl.module
+import org.litote.kmongo.coroutine.coroutine
+import org.litote.kmongo.reactivestreams.KMongo
 
 /**
  * Copyright 2019 Yazan Yarifi
@@ -19,21 +23,9 @@ package utils
 /**
  * Created By : Yazan Tarifi
  * Date : 7/17/2019
- * Time : 2:37 PM
+ * Time : 8:08 PM
  */
-object ReflexConsts {
-    const val port = 7090
-    const val host = "192.168.1.9"
-    const val DeveloperName = "Yazan"
-    const val ServerName = "Reflex"
-    const val Origin = "https://developer.reflex.com"
-    const val AcceptCharset = "application/x-www-form-urlencoded; charset=UTF-8"
-    const val ResponseType = "application/json;charset=utf-8"
 
-    const val databaseName = "reflex-db"
-    const val profileCollection = "profiles"
-    const val SMS_API_KEY = "P0lP+Xh/XQE-sRjObTuFH6k5xwJ7BQlDm5xxC7LOsB"
-
-    const val smsSender = "Reflex Service"
-    const val createdNewAccountSms = "Welcome To Reflex Service Enjoy :D ^^"
+val modules = module {
+    single { KMongo.createClient("mongodb://127.0.0.1:32768").coroutine }
 }

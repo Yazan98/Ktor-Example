@@ -1,4 +1,7 @@
-package utils
+package presenter
+
+import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * Copyright 2019 Yazan Yarifi
@@ -19,21 +22,21 @@ package utils
 /**
  * Created By : Yazan Tarifi
  * Date : 7/17/2019
- * Time : 2:37 PM
+ * Time : 7:49 PM
  */
-object ReflexConsts {
-    const val port = 7090
-    const val host = "192.168.1.9"
-    const val DeveloperName = "Yazan"
-    const val ServerName = "Reflex"
-    const val Origin = "https://developer.reflex.com"
-    const val AcceptCharset = "application/x-www-form-urlencoded; charset=UTF-8"
-    const val ResponseType = "application/json;charset=utf-8"
 
-    const val databaseName = "reflex-db"
-    const val profileCollection = "profiles"
-    const val SMS_API_KEY = "P0lP+Xh/XQE-sRjObTuFH6k5xwJ7BQlDm5xxC7LOsB"
+interface KtorBasePresenter<E> {
 
-    const val smsSender = "Reflex Service"
-    const val createdNewAccountSms = "Welcome To Reflex Service Enjoy :D ^^"
+    suspend fun insertEntity(entity: E): E
+
+    suspend fun getEntityById(entityId: UUID): E
+
+    suspend fun getAllEntities(): ArrayList<E>
+
+    suspend fun deleteEntityById(entityId: UUID)
+
+    suspend fun updateEntity(entity: E): E
+
+    suspend fun deleteAllEntities()
+
 }
