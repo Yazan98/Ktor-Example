@@ -23,7 +23,8 @@ package utils
  */
 object ReflexConsts {
     const val port = 7090
-    const val host = "192.168.1.9"
+    const val petUuid = "petUuid"
+    const val host = "localhost"
     const val DeveloperName = "Yazan"
     const val ServerName = "Reflex"
     const val Origin = "https://developer.reflex.com"

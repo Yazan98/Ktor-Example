@@ -3,6 +3,7 @@ package server
 import org.koin.dsl.module
 import org.litote.kmongo.coroutine.coroutine
 import org.litote.kmongo.reactivestreams.KMongo
+import presenter.ProfilePresenter
 
 /**
  * Copyright 2019 Yazan Yarifi
@@ -27,5 +28,9 @@ import org.litote.kmongo.reactivestreams.KMongo
  */
 
 val modules = module {
-    single { KMongo.createClient("mongodb://127.0.0.1:32768").coroutine }
+    single { KMongo.createClient("mongodb://127.0.0.1:27017").coroutine }
+}
+
+val presenters = module {
+    single { ProfilePresenter() }
 }

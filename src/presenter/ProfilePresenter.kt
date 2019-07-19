@@ -3,8 +3,9 @@ package presenter
 import com.mongodb.client.model.InsertOneOptions
 import kotlinx.coroutines.runBlocking
 import models.profile.Profile
-import org.koin.java.KoinJavaComponent.inject
 import org.litote.kmongo.coroutine.CoroutineClient
+import org.litote.kmongo.coroutine.coroutine
+import org.litote.kmongo.reactivestreams.KMongo
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import utils.ReflexConsts
@@ -38,7 +39,10 @@ import java.util.*
 class ProfilePresenter : KtorBasePresenter<Profile> {
 
     val logger: Logger = LoggerFactory.getLogger("ProfilePresenter")
-    val client: CoroutineClient by inject()
+    //    val client: CoroutineClient by inject()
+    val client: CoroutineClient by lazy {
+        KMongo.createClient("mongodb://127.0.0.1:27017").coroutine
+    }
 
     override suspend fun insertEntity(entity: Profile): Profile {
         logger.debug("... Insert Entity Started ...")

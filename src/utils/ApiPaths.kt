@@ -1,10 +1,4 @@
-package view
-
-import io.ktor.application.Application
-import io.ktor.application.call
-import io.ktor.response.respondText
-import io.ktor.routing.get
-import io.ktor.routing.routing
+package utils
 
 /**
  * Copyright 2019 Yazan Yarifi
@@ -25,13 +19,8 @@ import io.ktor.routing.routing
 /**
  * Created By : Yazan Tarifi
  * Date : 7/17/2019
- * Time : 2:55 PM
+ * Time : 8:51 PM
  */
-
-fun Application.DemoView() {
-    routing {
-        get(path = "/hello") {
-            call.respondText("OK")
-        }
-    }
+object ApiPaths {
+    const val PROFILES = "api/v1/profiles"
 }

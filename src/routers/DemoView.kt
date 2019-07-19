@@ -1,9 +1,9 @@
-package view
+package routers
 
 import io.ktor.application.Application
-import io.ktor.routing.Route
+import io.ktor.application.call
+import io.ktor.response.respondText
 import io.ktor.routing.get
-import io.ktor.routing.route
 import io.ktor.routing.routing
 
 /**
@@ -25,18 +25,13 @@ import io.ktor.routing.routing
 /**
  * Created By : Yazan Tarifi
  * Date : 7/17/2019
- * Time : 7:47 PM
+ * Time : 2:55 PM
  */
 
-class ProfileView {
-
-    fun Route.profileRouting() {
-        route("/profiles") {
-
-            get("/") {
-
-            }
-
+fun Application.DemoView() {
+    routing {
+        get(path = "/hello") {
+            call.respondText("OK")
         }
     }
 }

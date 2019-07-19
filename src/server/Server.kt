@@ -1,6 +1,12 @@
 package server
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.SerializationFeature
+import de.nielsfalk.ktor.swagger.SwaggerSupport
+import de.nielsfalk.ktor.swagger.version.shared.Contact
+import de.nielsfalk.ktor.swagger.version.shared.Information
+import de.nielsfalk.ktor.swagger.version.v2.Swagger
+import de.nielsfalk.ktor.swagger.version.v3.OpenApi
 import io.ktor.application.Application
 import io.ktor.application.install
 import io.ktor.client.HttpClient
@@ -25,8 +31,10 @@ import kotlinx.coroutines.channels.map
 import kotlinx.coroutines.runBlocking
 import org.koin.ktor.ext.installKoin
 import org.slf4j.event.Level
+import routers.DemoView
+import routers.profileRouting
 import utils.ReflexConsts
-import view.DemoView
+import java.io.IOException
 import java.util.*
 
 /**
@@ -96,6 +104,7 @@ fun Application.addDefaultApplicationConfiguration() {
 
     install(ContentNegotiation) {
         jackson {
+            setSerializationInclusion(JsonInclude.Include.NON_NULL)
             enable(SerializationFeature.INDENT_OUTPUT)
         }
     }
@@ -115,11 +124,73 @@ fun Application.addDefaultApplicationConfiguration() {
 
     installKoin {
         modules(modules)
+        modules(presenters)
+    }
+
+    install(SwaggerSupport) {
+        forwardRoot = true
+        val information = Information(
+            version = "0.1",
+            title = "Sample Ktor Application",
+            description = "This Application Is Just Sample To Build Ktor Server Application With Firebase And Mongo Database",
+            contact = Contact(
+                name = "Yazan Tarifi",
+                url = "https://github.com/Yazan98"
+            )
+        )
+        swagger = Swagger().apply {
+            info = information
+            definitions["size"] = sizeSchemaMap
+            definitions[ReflexConsts.petUuid] = petIdSchema
+            definitions["Rectangle"] = rectangleSchemaMap("#/definitions")
+        }
+        openApi = OpenApi().apply {
+            info = information
+            components.schemas["size"] = sizeSchemaMap
+            components.schemas[ReflexConsts.petUuid] = petIdSchema
+            components.schemas["Rectangle"] = rectangleSchemaMap("#/components/schemas")
+        }
     }
 
     routing {
-
+        profileRouting()
     }
+
+    println(
+        """
+                Reflex Ktor Application Started ...
+                Address : ${ReflexConsts.host}
+                Port : ${ReflexConsts.port}
+                Swagger Page : https://${ReflexConsts.host}:${ReflexConsts.port}/swagger-ui.html
+                Developer Name : ${ReflexConsts.DeveloperName}
+            """.trimIndent()
+    )
+
+    automaticStartupLinks("https://${ReflexConsts.host}:${ReflexConsts.port}/swagger-ui.html")
 
 }
 
+val sizeSchemaMap = mapOf(
+    "type" to "number",
+    "minimum" to 0
+)
+
+val petIdSchema = mapOf(
+    "type" to "string",
+    "format" to "date",
+    "description" to "The identifier of the pet to be accessed"
+)
+
+fun rectangleSchemaMap(refBase: String) = mapOf(
+    "type" to "object",
+    "properties" to mapOf(
+        "a" to mapOf("${'$'}ref" to "$refBase/size"),
+        "b" to mapOf("${'$'}ref" to "$refBase/size")
+    )
+)
+
+@Throws(IOException::class)
+private fun automaticStartupLinks(url: String) {
+    val rt = Runtime.getRuntime()
+    rt.exec("rundll32 url.dll,FileProtocolHandler $url")
+}
