@@ -1,6 +1,5 @@
 package models.profile
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import org.bson.codecs.pojo.annotations.BsonId
 import java.util.*
 
@@ -29,7 +28,7 @@ import java.util.*
 data class Profile(
     @BsonId var id: UUID = UUID.randomUUID(),
     var email: String,
-    @JsonIgnore var password: String,
+    var password: String,
     var name: String,
     var enabled: Boolean,
     var type: String,
