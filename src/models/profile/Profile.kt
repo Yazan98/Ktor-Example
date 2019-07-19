@@ -28,7 +28,7 @@ import java.util.*
 data class Profile(
     @BsonId var id: UUID = UUID.randomUUID(),
     var email: String,
-    var password: String,
+    var password: String?,
     var name: String,
     var enabled: Boolean,
     var type: String,

@@ -2,12 +2,14 @@ package server
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.SerializationFeature
+import com.sun.media.sound.InvalidDataException
 import de.nielsfalk.ktor.swagger.SwaggerSupport
 import de.nielsfalk.ktor.swagger.version.shared.Contact
 import de.nielsfalk.ktor.swagger.version.shared.Information
 import de.nielsfalk.ktor.swagger.version.v2.Swagger
 import de.nielsfalk.ktor.swagger.version.v3.OpenApi
 import io.ktor.application.Application
+import io.ktor.application.call
 import io.ktor.application.install
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
@@ -16,11 +18,13 @@ import io.ktor.client.features.websocket.ws
 import io.ktor.features.*
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.cio.websocket.Frame
 import io.ktor.http.cio.websocket.readText
 import io.ktor.jackson.jackson
 import io.ktor.locations.Locations
 import io.ktor.request.path
+import io.ktor.response.respond
 import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
@@ -31,6 +35,7 @@ import kotlinx.coroutines.channels.map
 import kotlinx.coroutines.runBlocking
 import org.koin.ktor.ext.installKoin
 import org.slf4j.event.Level
+import response.ErrorResponse
 import routers.DemoView
 import routers.profileRouting
 import utils.ReflexConsts
@@ -127,6 +132,42 @@ fun Application.addDefaultApplicationConfiguration() {
         modules(presenters)
     }
 
+    install(StatusPages) {
+
+        exception<NotFoundException> { cause ->
+            call.respond(
+                HttpStatusCode.NotFound,
+                ErrorResponse(
+                    cause.message!!,
+                    HttpStatusCode.NotFound.value,
+                    cause.stackTrace
+                )
+            )
+        }
+
+        exception<InvalidDataException> { cause ->
+            call.respond(
+                HttpStatusCode.BadRequest,
+                ErrorResponse(
+                    cause.message!!,
+                    HttpStatusCode.BadRequest.value,
+                    cause.stackTrace
+                )
+            )
+        }
+
+        exception<KotlinNullPointerException> { cause ->
+            call.respond(
+                HttpStatusCode.NotFound,
+                ErrorResponse(
+                    "Data Not Found",
+                    HttpStatusCode.NotFound.value,
+                    cause.stackTrace
+                )
+            )
+        }
+    }
+
     install(SwaggerSupport) {
         forwardRoot = true
         val information = Information(
@@ -138,17 +179,19 @@ fun Application.addDefaultApplicationConfiguration() {
                 url = "https://github.com/Yazan98"
             )
         )
+
         swagger = Swagger().apply {
             info = information
-            definitions["size"] = sizeSchemaMap
-            definitions[ReflexConsts.petUuid] = petIdSchema
-            definitions["Rectangle"] = rectangleSchemaMap("#/definitions")
+//            definitions["size"] = sizeSchemaMap
+//            definitions[ReflexConsts.petUuid] = petIdSchema
+//            definitions["Rectangle"] = rectangleSchemaMap("#/definitions")
         }
+
         openApi = OpenApi().apply {
             info = information
-            components.schemas["size"] = sizeSchemaMap
-            components.schemas[ReflexConsts.petUuid] = petIdSchema
-            components.schemas["Rectangle"] = rectangleSchemaMap("#/components/schemas")
+//            components.schemas["size"] = sizeSchemaMap
+//            components.schemas[ReflexConsts.petUuid] = petIdSchema
+//            components.schemas["Rectangle"] = rectangleSchemaMap("#/components/schemas")
         }
     }
 
@@ -166,7 +209,7 @@ fun Application.addDefaultApplicationConfiguration() {
             """.trimIndent()
     )
 
-    automaticStartupLinks("https://${ReflexConsts.host}:${ReflexConsts.port}/apidocs/index.html?url=./openapi.json")
+    automaticStartupLinks("https://${ReflexConsts.host}:${ReflexConsts.port}/")
 
 }
 

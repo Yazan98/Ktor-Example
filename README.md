@@ -8,4 +8,4 @@ Kotlin Version : 1.3.10
 Ktor Version : 1.2.2
 Koin Version : 2.0.1
 
-Swagger Page : http://localhost:7090/apidocs/index.html?url=./openapi.json
+Swagger Page : http://localhost:7090/

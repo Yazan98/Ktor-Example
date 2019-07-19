@@ -1,6 +1,7 @@
 package presenter
 
 import com.mongodb.client.model.InsertOneOptions
+import com.sun.media.sound.InvalidDataException
 import kotlinx.coroutines.runBlocking
 import models.profile.Profile
 import org.litote.kmongo.coroutine.CoroutineClient
@@ -48,23 +49,32 @@ class ProfilePresenter : KtorBasePresenter<Profile> {
         logger.debug("... Insert Entity Started ...")
         logger.debug("... Insert Entity Started ... Data : $entity")
 
-        entity.phoneNumber = getCorrectPhoneNumber(entity.phoneNumber)
-        entity.enabled = true
+        when {
+            entity.email.isEmpty() -> throw InvalidDataException("Profile Email Missing")
+            entity.name.isEmpty() -> throw InvalidDataException("Profile Name Missing")
+            entity.password!!.isEmpty() -> throw InvalidDataException("Profile Password Missing")
+            entity.phoneNumber.isEmpty() -> throw InvalidDataException("Profile PhoneNumber Missing")
+            else -> {
+                entity.phoneNumber = getCorrectPhoneNumber(entity.phoneNumber)
+                entity.enabled = true
 
-        client.getDatabase(ReflexConsts.databaseName)
-            .getCollection<Profile>(ReflexConsts.profileCollection)
-            .insertOne(entity, InsertOneOptions())
+                client.getDatabase(ReflexConsts.databaseName)
+                    .getCollection<Profile>(ReflexConsts.profileCollection)
+                    .insertOne(entity, InsertOneOptions())
 
-        runBlocking {
-            sendMessage(
-                sender = ReflexConsts.smsSender,
-                content = ReflexConsts.createdNewAccountSms,
-                reciver = entity.phoneNumber
-            )
+                runBlocking {
+                    sendMessage(
+                        sender = ReflexConsts.smsSender,
+                        content = ReflexConsts.createdNewAccountSms,
+                        reciver = entity.phoneNumber
+                    )
+                }
+
+                logger.debug("... Insert Entity Finished ...")
+                return getEntityById(entity.id)
+            }
         }
 
-        logger.debug("... Insert Entity Finished ...")
-        return getEntityById(entity.id)
     }
 
     override suspend fun getEntityById(entityId: UUID): Profile {

@@ -7,6 +7,7 @@ import io.ktor.routing.*
 import models.profile.Profile
 import org.koin.java.KoinJavaComponent.inject
 import presenter.ProfilePresenter
+import response.SuccessResponse
 import utils.ApiPaths
 import java.util.*
 
@@ -42,7 +43,11 @@ fun Route.profileRouting() {
             val result: Profile = presenter.insertEntity(request)
             call.respond(
                 HttpStatusCode.OK,
-                result
+                SuccessResponse(
+                    result,
+                    HttpStatusCode.OK.value,
+                    "Success"
+                )
             )
         }
 
@@ -50,7 +55,11 @@ fun Route.profileRouting() {
             val result: Profile = presenter.getEntityById(UUID.fromString(call.parameters["id"]))
             call.respond(
                 HttpStatusCode.OK,
-                result
+                SuccessResponse(
+                    result,
+                    HttpStatusCode.OK.value,
+                    "Success"
+                )
             )
         }
 
