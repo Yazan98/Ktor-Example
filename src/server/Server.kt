@@ -161,12 +161,12 @@ fun Application.addDefaultApplicationConfiguration() {
                 Reflex Ktor Application Started ...
                 Address : ${ReflexConsts.host}
                 Port : ${ReflexConsts.port}
-                Swagger Page : https://${ReflexConsts.host}:${ReflexConsts.port}/swagger-ui.html
+                Swagger Page : https://${ReflexConsts.host}:${ReflexConsts.port}/apidocs/index.html?url=./openapi.json
                 Developer Name : ${ReflexConsts.DeveloperName}
             """.trimIndent()
     )
 
-    automaticStartupLinks("https://${ReflexConsts.host}:${ReflexConsts.port}/swagger-ui.html")
+    automaticStartupLinks("https://${ReflexConsts.host}:${ReflexConsts.port}/apidocs/index.html?url=./openapi.json")
 
 }
 
