@@ -42,3 +42,8 @@ data class ProfileLocation(
     var latitude: Double,
     var longitude: Double
 )
+
+data class LoginProfile(
+    var email: String?,
+    var password: String?
+)

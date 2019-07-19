@@ -4,6 +4,7 @@ import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
 import io.ktor.response.respond
 import io.ktor.routing.*
+import models.profile.LoginProfile
 import models.profile.Profile
 import org.koin.java.KoinJavaComponent.inject
 import presenter.ProfilePresenter
@@ -41,6 +42,18 @@ fun Route.profileRouting() {
 
         post<Profile>("/") { request ->
             val result: Profile = presenter.insertEntity(request)
+            call.respond(
+                HttpStatusCode.OK,
+                SuccessResponse(
+                    result,
+                    HttpStatusCode.OK.value,
+                    "Success"
+                )
+            )
+        }
+
+        post<LoginProfile>("/login") { request ->
+            val result: Profile = presenter.login(request)
             call.respond(
                 HttpStatusCode.OK,
                 SuccessResponse(

@@ -2,12 +2,13 @@ package server
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.SerializationFeature
-import com.sun.media.sound.InvalidDataException
+import com.mongodb.MongoCommandException
 import de.nielsfalk.ktor.swagger.SwaggerSupport
 import de.nielsfalk.ktor.swagger.version.shared.Contact
 import de.nielsfalk.ktor.swagger.version.shared.Information
 import de.nielsfalk.ktor.swagger.version.v2.Swagger
 import de.nielsfalk.ktor.swagger.version.v3.OpenApi
+import exception.InvalidDataException
 import io.ktor.application.Application
 import io.ktor.application.call
 import io.ktor.application.install
@@ -33,6 +34,7 @@ import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.channels.filterNotNull
 import kotlinx.coroutines.channels.map
 import kotlinx.coroutines.runBlocking
+import org.bson.json.JsonParseException
 import org.koin.ktor.ext.installKoin
 import org.slf4j.event.Level
 import response.ErrorResponse
@@ -135,6 +137,7 @@ fun Application.addDefaultApplicationConfiguration() {
     install(StatusPages) {
 
         exception<NotFoundException> { cause ->
+            cause.printStackTrace()
             call.respond(
                 HttpStatusCode.NotFound,
                 ErrorResponse(
@@ -146,6 +149,7 @@ fun Application.addDefaultApplicationConfiguration() {
         }
 
         exception<InvalidDataException> { cause ->
+            cause.printStackTrace()
             call.respond(
                 HttpStatusCode.BadRequest,
                 ErrorResponse(
@@ -162,6 +166,30 @@ fun Application.addDefaultApplicationConfiguration() {
                 ErrorResponse(
                     "Data Not Found",
                     HttpStatusCode.NotFound.value,
+                    cause.stackTrace
+                )
+            )
+        }
+
+        exception<JsonParseException> { cause ->
+            cause.printStackTrace()
+            call.respond(
+                HttpStatusCode.InternalServerError,
+                ErrorResponse(
+                    "Data Not Found ... Maybe The Json Data Is Invalid",
+                    HttpStatusCode.InternalServerError.value,
+                    cause.stackTrace
+                )
+            )
+        }
+
+        exception<MongoCommandException> {cause ->
+            cause.printStackTrace()
+            call.respond(
+                HttpStatusCode.InternalServerError,
+                ErrorResponse(
+                    "Data Not Found ... DataBase Error ... Maybe The Bson Command Is Invalid",
+                    HttpStatusCode.InternalServerError.value,
                     cause.stackTrace
                 )
             )
@@ -209,7 +237,7 @@ fun Application.addDefaultApplicationConfiguration() {
             """.trimIndent()
     )
 
-    automaticStartupLinks("https://${ReflexConsts.host}:${ReflexConsts.port}/")
+//    automaticStartupLinks("https://${ReflexConsts.host}:${ReflexConsts.port}/")
 
 }
 

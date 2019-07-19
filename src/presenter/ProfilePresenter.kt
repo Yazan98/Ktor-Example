@@ -1,8 +1,9 @@
 package presenter
 
 import com.mongodb.client.model.InsertOneOptions
-import com.sun.media.sound.InvalidDataException
+import exception.InvalidDataException
 import kotlinx.coroutines.runBlocking
+import models.profile.LoginProfile
 import models.profile.Profile
 import org.litote.kmongo.coroutine.CoroutineClient
 import org.litote.kmongo.coroutine.coroutine
@@ -75,6 +76,21 @@ class ProfilePresenter : KtorBasePresenter<Profile> {
             }
         }
 
+    }
+
+    suspend fun login(body: LoginProfile): Profile {
+        logger.debug("... Login Request Started ...")
+        logger.debug("... Login Body Started ... Data : $body")
+
+        when {
+            body.email.isNullOrEmpty() -> throw InvalidDataException("Email Missing")
+            body.password.isNullOrEmpty() -> throw InvalidDataException("Password Missing")
+            else -> {
+                return client.getDatabase(ReflexConsts.databaseName)
+                    .getCollection<Profile>(ReflexConsts.profileCollection)
+                    .findOne("{ email: \"${body.email}\" , password: \"${body.password}\" }")!!
+            }
+        }
     }
 
     override suspend fun getEntityById(entityId: UUID): Profile {
